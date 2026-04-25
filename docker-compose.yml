@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  testes-qa:
+    build: .
+    container_name: cypress-e2e
+    network_mode: "host" 
+    volumes:
+      - ./:/app
+      - /app/node_modules
