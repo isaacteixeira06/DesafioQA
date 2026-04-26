@@ -11,12 +11,20 @@ class LoginPage {
     }
 
     preencherUsuario(usuario: string) {
-        this.inputUsuario.clear().type(usuario);
+    this.inputUsuario.clear();
+
+    if (usuario) {
+        this.inputUsuario.type(usuario);
     }
+}
 
     preencherSenha(senha: string) {
-        this.inputSenha.clear().type(senha);
+    this.inputSenha.clear();
+
+    if (senha) {
+        this.inputSenha.type(senha);
     }
+}
 
     clicarEntrar() {
         this.btnEntrar.click();
