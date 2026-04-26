@@ -8,15 +8,15 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
 
     it('Deve realizar login com credenciais válidas com sucesso', () => {
         loginPage.realizarLogin('admin', 'admin123');
-        cy.url().should('include', '/dashboard');
+        loginPage.verificarLoginComSucesso();
     });
 
     it('Deve exibir erro com credenciais inválidas', () => {
         loginPage.realizarLogin('usuario_fake', 'senha_fake');
-        loginPage.msgErro.should('be.visible');
+        loginPage.verificarErroVisivel();
+        loginPage.verificarPermaneceNaTelaLogin();
     });
 
-    
     const cenariosInvalidos = [
         { usuario: '', senha: '', descricao: 'campos vazios' },
         { usuario: 'admin', senha: '', descricao: 'senha vazia' },
@@ -31,7 +31,10 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
     cenariosInvalidos.forEach(({ usuario, senha, descricao }) => {
         it(`Deve validar erro para: ${descricao}`, () => {
             loginPage.realizarLogin(usuario, senha);
-            loginPage.msgErro.should('be.visible');
+
+            loginPage.verificarErroVisivel();
+            loginPage.verificarMensagemErroNaoVazia();
+            loginPage.verificarPermaneceNaTelaLogin();
         });
     });
 });
