@@ -126,6 +126,8 @@ describe('Testes de Validação - Coleta de Dados', () => {
         coletaPage.divLoteMessage.should('not.contain.text', 'sucesso');
     });
 
+    // --- HISTORICO ---
+
     it('Não deve exibir o histórico de coletas de outros usuários (Vazamento de Dados)', () => {
         coletaPage.abaHistorico.click();
         coletaPage.btnCarregarHistorico.click();
