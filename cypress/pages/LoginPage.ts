@@ -55,6 +55,34 @@ class LoginPage {
     verificarPermaneceNaTelaLogin() {
         cy.url().should('not.include', '/dashboard');
     }
+
+
+    
+    verificarSessaoCriada() {
+        cy.window().then((win) => {
+            const user = win.localStorage.getItem('user');
+            expect(user).to.not.be.null;
+        });
+    }
+
+    
+    interceptarLogin() {
+        cy.intercept('POST', '/login').as('loginRequest');
+    }
+
+    validarRespostaSucesso() {
+        cy.wait('@loginRequest')
+            .its('response.statusCode')
+            .should('eq', 200);
+    }
+
+    validarRespostaErro() {
+        cy.wait('@loginRequest')
+            .its('response.statusCode')
+            .should('be.oneOf', [400, 401]);
+    }
+
+
 }
 
 export default new LoginPage();
