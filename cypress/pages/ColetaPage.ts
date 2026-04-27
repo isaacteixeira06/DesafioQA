@@ -22,6 +22,12 @@ class ColetaPage {
     get btnSubmeterColeta() { return cy.get('[data-testid="submit-coleta"]'); }
     get btnPreVisualizar() { return cy.get('[data-testid="preview-coleta"]'); }
 
+    // --- COLETA EM LOTE ---
+    get inputArquivoLote() { return cy.get('[data-testid="arquivo-lote"]'); }
+    get checkboxValidarDuplicatas() { return cy.get('[data-testid="validar-duplicatas"]'); }
+    get btnSubmitLote() { return cy.get('[data-testid="submit-lote"]'); }
+    get divLoteMessage() { return cy.get('[data-testid="lote-message"]'); }
+
     // --- AÇÕES COMUNS ---
     acessarPagina() {
         cy.visit('/coleta');
