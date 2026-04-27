@@ -28,6 +28,10 @@ class ColetaPage {
     get btnSubmitLote() { return cy.get('[data-testid="submit-lote"]'); }
     get divLoteMessage() { return cy.get('[data-testid="lote-message"]'); }
 
+    // --- HISTÓRICO ---
+    get btnCarregarHistorico() { return cy.get('[data-testid="carregar-historico"]'); }
+    get divHistoricoData() { return cy.get('[data-testid="historico-data"]'); }
+
     // --- AÇÕES COMUNS ---
     acessarPagina() {
         cy.visit('/coleta');
