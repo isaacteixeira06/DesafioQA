@@ -26,6 +26,11 @@ describe('Testes de Validação - Coleta de Dados', () => {
         coletaPage.inputIdBeneficiario.should('have.value', ''); 
     });
 
+    it('Deve validar o comprimento mínimo e máximo do Nome Completo', () => {
+        coletaPage.inputNomeCompleto.should('have.attr', 'minlength');
+        coletaPage.inputNomeCompleto.should('have.attr', 'maxlength');
+    });
+
     it('Não deve aceitar valores negativos na Taxa de Conclusão', () => {
         coletaPage.inputIdBeneficiario.type('101'); 
         coletaPage.inputNomeCompleto.type('João Teste');
@@ -65,9 +70,11 @@ describe('Testes de Validação - Coleta de Dados', () => {
         cy.get('input:invalid').should('have.length', 1);
     });
 
-    it('Deve limitar caracteres e sanitizar input contra XSS nas Observações', () => {
+    it('Deve limitar o tamanho do campo de Observações', () => {
         coletaPage.textareaObservacoes.should('have.attr', 'maxlength');
-        
+    });
+
+    it('Deve sanitizar input contra XSS nas Observações', () => {
         const payloadXSS = '<script>alert("XSS")</script>';
         coletaPage.textareaObservacoes.type(payloadXSS);
         coletaPage.textareaObservacoes.should('not.have.value', payloadXSS);
