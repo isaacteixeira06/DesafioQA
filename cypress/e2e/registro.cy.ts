@@ -25,6 +25,14 @@ describe('Testes de Sistema (E2E) - Tela de Registro', () => {
         registerPage.verificarMensagemErroVisivel();
     });
 
+    it('Deve renderizar o campo de email com o type HTML correto', () => {
+        cy.get('[data-testid="register-email"]').should('have.attr', 'type', 'email');
+    });
+
+    it('Deve exibir os requisitos de senha na tela para o usuário', () => {
+        cy.contains(/8 caracteres|letras e números|requisitos de senha/i).should('be.visible');
+    });
+
     const cenariosInvalidos = [
     
     // email invalido
