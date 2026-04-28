@@ -1,10 +1,27 @@
-version: '3.8'
-
 services:
-  testes-qa:
-    build: .
-    container_name: cypress-e2e
-    network_mode: "host" 
+  sistema-alvo:
+    build: ./app
+    container_name: app-desafio-qa
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  testes-cypress:
+    build:
+      context: .
+      dockerfile: Dockerfile.cypress
+    container_name: cypress-automation
+    depends_on:
+      sistema-alvo:
+        condition: service_healthy
+    environment:
+      - CYPRESS_baseUrl=http://sistema-alvo:3000
     volumes:
-      - ./:/app
-      - /app/node_modules
+      - ./cypress:/opt/cypress/cypress
+      - ./cypress.config.ts:/opt/cypress/cypress.config.ts
+      - ./cypress/reports:/opt/cypress/reports

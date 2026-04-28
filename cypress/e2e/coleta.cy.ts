@@ -9,7 +9,7 @@ describe('Testes de Validação - Coleta de Dados', () => {
     before(() => {
         cy.request({
             method: 'POST',
-            url: 'http://localhost:3000/register',
+            url: '/register',
             body: { username: usuarioColeta, email: `${usuarioColeta}@teste.com`, password: senhaColeta },
             failOnStatusCode: false
         });

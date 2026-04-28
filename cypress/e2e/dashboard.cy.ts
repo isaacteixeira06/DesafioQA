@@ -11,7 +11,7 @@ describe('Testes de Sistema (E2E) - Dashboard', () => {
     before(() => {
         cy.request({
             method: 'POST',
-            url: 'http://localhost:3000/register',
+            url: '/register',
             body: {
                 username: usuarioDinamico,
                 email: emailDinamico,
@@ -59,7 +59,7 @@ describe('Testes de Sistema (E2E) - Dashboard', () => {
     it('Não deve permitir acesso a dados de outro usuário manipulando a API (IDOR)', () => {
         cy.request({
             method: 'GET',
-            url: 'http://localhost:3000/api/user?userId=1',
+            url: '/api/user?userId=1',
             failOnStatusCode: false
         }).then((response) => {
             expect(response.body).to.have.property('username');
@@ -84,7 +84,7 @@ describe('Testes de Sistema (E2E) - Dashboard', () => {
     cy.clearCookies();
 
     cy.request({
-      url: 'http://localhost:3000/dashboard',
+      url: '/dashboard',
       failOnStatusCode: false
     }).then((response) => {
 

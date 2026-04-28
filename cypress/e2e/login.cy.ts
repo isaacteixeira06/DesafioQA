@@ -6,7 +6,7 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
     before(() => {
         cy.request({
         method: 'POST',
-        url: 'http://localhost:3000/register',
+        url: '/register',
         body: {
             username: loginData.valido.usuario,
             email: loginData.valido.email,

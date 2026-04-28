@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coleta de Dados - QA Test</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .coleta-container {
+        max-width: 900px;
+      }
+
+      .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
+      .form-section:last-child {
+        border-bottom: none;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .form-grid-full {
+        grid-column: 1 / -1;
+      }
+
+      .form-group textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        transition: border-color 0.3s;
+      }
+
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+      }
+
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .indicator-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .indicator-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #667eea;
+      }
+
+      .indicator-item label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .indicator-item input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+      }
+
+      .nav-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
+      .nav-tab {
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-size: 16px;
+        color: #666;
+        font-weight: 500;
+        transition: all 0.3s;
+      }
+
+      .nav-tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .data-preview {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-top: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .data-preview pre {
+        margin: 0;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <header class="dashboard-header">
+        <h1>Coleta de Dados - Beneficiários</h1>
+        <button
+          onclick="logout()"
+          class="btn btn-secondary"
+          data-testid="logout-button"
+        >
+          Sair
+        </button>
+      </header>
+
+      <div class="dashboard-content">
+        <div class="coleta-container">
+          <!-- Abas de Navegação -->
+          <div class="nav-tabs">
+            <button
+              class="nav-tab active"
+              data-testid="tab-individual"
+              onclick="showTab('individual')"
+            >
+              Coleta Individual
+            </button>
+            <button
+              class="nav-tab"
+              data-testid="tab-lote"
+              onclick="showTab('lote')"
+            >
+              Coleta em Lote
+            </button>
+            <button
+              class="nav-tab"
+              data-testid="tab-historico"
+              onclick="showTab('historico')"
+            >
+              Histórico
+            </button>
+          </div>
+
+          <!-- Aba: Coleta Individual -->
+          <div id="individual" class="tab-content active">
+            <div class="form-section">
+              <h2>Dados do Beneficiário</h2>
+              <form id="coletaForm" onsubmit="submitColeta(event)">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="beneficiarioId">ID do Beneficiário:</label>
+                    <!-- BUG 43: Campo aceita qualquer valor sem validação numérica -->
+                    <input
+                      type="text"
+                      id="beneficiarioId"
+                      name="beneficiarioId"
+                      data-testid="beneficiario-id"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="beneficiarioNome">Nome Completo:</label>
+                    <!-- BUG 44: Não valida comprimento mínimo/máximo -->
+                    <input
+                      type="text"
+                      id="beneficiarioNome"
+                      name="beneficiarioNome"
+                      data-testid="beneficiario-nome"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="form-section">
+              <h2>Indicadores de Desempenho</h2>
+              <form id="indicadoresForm">
+                <div class="indicator-list">
+                  <div class="indicator-item">
+                    <label for="indicador1">Taxa de Conclusão (%):</label>
+                    <!-- BUG 45: Aceita valores negativos -->
+                    <input
+                      type="number"
+                      id="indicador1"
+                      name="indicador1"
+                      data-testid="indicador-conclusao"
+                    />
+                  </div>
+                  <div class="indicator-item">
+                    <label for="indicador2">Frequência de Presença (%):</label>
+                    <!-- BUG 46: Aceita valores acima de 100 -->
+                    <input
+                      type="number"
+                      id="indicador2"
+                      name="indicador2"
+                      data-testid="indicador-frequencia"
+                    />
+                  </div>
+                  <div class="indicator-item">
+                    <label for="indicador3">Nota de Avaliação (0-10):</label>
+                    <!-- BUG 47: Não limita máximo a 10 -->
+                    <input
+                      type="number"
+                      id="indicador3"
+                      name="indicador3"
+                      data-testid="indicador-nota"
+                      step="0.1"
+                    />
+                  </div>
+                  <div class="indicator-item">
+                    <label for="indicador4">Progresso Técnico (pontos):</label>
+                    <input
+                      type="number"
+                      id="indicador4"
+                      name="indicador4"
+                      data-testid="indicador-progresso"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group form-grid-full" style="margin-top: 20px">
+                  <label for="observacoes">Observações:</label>
+                  <!-- BUG 48: Sem limite de caracteres (XSS potencial) -->
+                  <textarea
+                    id="observacoes"
+                    name="observacoes"
+                    data-testid="observacoes"
+                    placeholder="Digite observações adicionais..."
+                  ></textarea>
+                </div>
+
+                <div class="form-group form-grid-full">
+                  <label for="status">Status da Avaliação:</label>
+                  <!-- BUG 49: Sem validação padrão -->
+                  <select id="status" name="status" data-testid="coleta-status">
+                    <option value="">Selecione um status...</option>
+                    <option value="em_progresso">Em Progresso</option>
+                    <option value="completo">Completo</option>
+                    <option value="pendente_revisao">
+                      Pendente de Revisão
+                    </option>
+                    <option value="aprovado">Aprovado</option>
+                    <option value="rejeitado">Rejeitado</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+
+            <div class="form-section">
+              <button
+                type="submit"
+                form="coletaForm"
+                class="btn btn-primary"
+                data-testid="submit-coleta"
+              >
+                Submeter Coleta
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="preview-coleta"
+                style="margin-left: 10px"
+                onclick="previewColeta()"
+              >
+                Pré-visualizar
+              </button>
+            </div>
+
+            <div
+              id="coletaMessage"
+              class="message"
+              data-testid="coleta-message"
+            ></div>
+            <div
+              id="coletaPreview"
+              class="data-preview"
+              style="display: none"
+              data-testid="coleta-preview"
+            >
+              <pre id="previewContent"></pre>
+            </div>
+          </div>
+
+          <!-- Aba: Coleta em Lote -->
+          <div id="lote" class="tab-content">
+            <div class="form-section">
+              <h2>Upload de Arquivo em Lote</h2>
+              <form id="loteForm" onsubmit="submitLote(event)">
+                <div class="form-group">
+                  <label for="arquivoCSV">Arquivo CSV/Excel:</label>
+                  <!-- BUG 50: Não valida tipo de arquivo realmente -->
+                  <input
+                    type="file"
+                    id="arquivoCSV"
+                    name="arquivo"
+                    data-testid="arquivo-lote"
+                    accept=".csv,.xlsx,.xls"
+                  />
+                  <p style="color: #666; font-size: 12px; margin-top: 10px">
+                    Formato esperado: ID, Nome, Taxa Conclusão, Frequência,
+                    Nota, Progresso, Status
+                  </p>
+                </div>
+
+                <div class="form-group">
+                  <label for="validarDuplicatas">
+                    <!-- BUG 51: Validação de duplicatas não funciona realmente -->
+                    <input
+                      type="checkbox"
+                      id="validarDuplicatas"
+                      name="validarDuplicatas"
+                      data-testid="validar-duplicatas"
+                    />
+                    Validar duplicatas
+                  </label>
+                </div>
+              </form>
+
+              <button
+                type="submit"
+                form="loteForm"
+                class="btn btn-primary"
+                data-testid="submit-lote"
+              >
+                Fazer Upload
+              </button>
+            </div>
+
+            <div
+              id="loteMessage"
+              class="message"
+              data-testid="lote-message"
+            ></div>
+          </div>
+
+          <!-- Aba: Histórico -->
+          <div id="historico" class="tab-content">
+            <div class="form-section">
+              <h2>Histórico de Coletas</h2>
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-testid="carregar-historico"
+                onclick="loadHistorico()"
+              >
+                Carregar Histórico
+              </button>
+            </div>
+
+            <!-- BUG 52: Histórico visível para todos os usuários, não apenas seus dados -->
+            <div
+              id="historicoData"
+              class="users-list"
+              data-testid="historico-data"
+            >
+              <p>Clique no botão acima para carregar o histórico...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="coleta.js"></script>
+  </body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - QA Test</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <header class="dashboard-header">
+        <h1>Dashboard</h1>
+        <button
+          onclick="logout()"
+          class="btn btn-secondary"
+          data-testid="logout-button"
+        >
+          Sair
+        </button>
+      </header>
+
+      <div class="dashboard-content">
+        <!-- BUG 84: Menu de navegação sem proteção de acesso -->
+        <div
+          style="
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+          "
+        >
+          <a
+            href="/dashboard"
+            class="btn btn-primary"
+            style="
+              text-decoration: none;
+              display: inline-block;
+              padding: 12px 20px;
+              margin: 0;
+            "
+            >Dashboard</a
+          >
+          <a
+            href="/coleta"
+            class="btn btn-primary"
+            style="
+              text-decoration: none;
+              display: inline-block;
+              padding: 12px 20px;
+              margin: 0;
+            "
+            data-testid="link-coleta"
+            >Coleta de Dados</a
+          >
+        </div>
+
+        <div class="user-info" data-testid="user-info">
+          <h2>Informações do Usuário</h2>
+          <div id="userData" data-testid="user-data">
+            <p>Carregando...</p>
+          </div>
+        </div>
+
+        <!-- BUG 34: Seção administrativa visível para todos -->
+        <div class="admin-section" data-testid="admin-section">
+          <h2>Painel Administrativo</h2>
+          <button
+            onclick="loadAllUsers()"
+            class="btn btn-primary"
+            data-testid="load-users-button"
+          >
+            Carregar Todos os Usuários
+          </button>
+          <div
+            id="allUsersData"
+            class="users-list"
+            data-testid="all-users-list"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>

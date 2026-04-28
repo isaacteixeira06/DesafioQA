@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Login - QA Test</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <h1>Sistema de Autenticação</h1>
+
+        <!-- Abas de Login/Registro -->
+        <div class="tabs">
+          <button
+            class="tab active"
+            data-testid="tab-login"
+            onclick="showLogin()"
+          >
+            Login
+          </button>
+          <button
+            class="tab"
+            data-testid="tab-register"
+            onclick="showRegister()"
+          >
+            Registrar
+          </button>
+        </div>
+
+        <!-- Formulário de Login -->
+        <div id="loginForm" class="form">
+          <h2>Entrar</h2>
+          <form onsubmit="login(event)">
+            <div class="form-group">
+              <label for="loginUsername">Usuário:</label>
+              <input
+                type="text"
+                id="loginUsername"
+                name="username"
+                data-testid="login-username"
+                autocomplete="username"
+              />
+              <!-- BUG 25: Campo não tem validação required -->
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Senha:</label>
+              <input
+                type="password"
+                id="loginPassword"
+                name="password"
+                data-testid="login-password"
+                autocomplete="current-password"
+              />
+              <!-- BUG 26: Campo de senha permite copiar -->
+            </div>
+            <div class="form-group">
+              <!-- BUG 27: Checkbox "Lembrar-me" não faz nada -->
+              <input type="checkbox" id="rememberMe" />
+              <label for="rememberMe">Lembrar-me</label>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-testid="login-button"
+            >
+              Entrar
+            </button>
+          </form>
+          <p class="link-text">
+            <a href="#" onclick="showResetPassword()">Esqueceu sua senha?</a>
+          </p>
+          <div id="loginMessage" class="message" data-testid="message"></div>
+        </div>
+
+        <!-- Formulário de Registro -->
+        <div id="registerForm" class="form" style="display: none">
+          <h2>Criar Conta</h2>
+          <form onsubmit="register(event)">
+            <div class="form-group">
+              <label for="registerUsername">Usuário:</label>
+              <input
+                type="text"
+                id="registerUsername"
+                name="username"
+                data-testid="register-username"
+                autocomplete="username"
+              />
+              <!-- BUG 28: Não valida caracteres especiais -->
+              <!-- BUG 29: Permite usuários com espaços -->
+            </div>
+            <div class="form-group">
+              <label for="registerEmail">Email:</label>
+              <input
+                type="text"
+                id="registerEmail"
+                name="email"
+                data-testid="register-email"
+                autocomplete="email"
+              />
+              <!-- BUG 30: Tipo deveria ser "email" mas está como "text" -->
+            </div>
+            <div class="form-group">
+              <label for="registerPassword">Senha:</label>
+              <input
+                type="password"
+                id="registerPassword"
+                name="password"
+                data-testid="register-password"
+                autocomplete="new-password"
+              />
+              <!-- BUG 31: Não mostra requisitos de senha -->
+            </div>
+            <div class="form-group">
+              <label for="registerPasswordConfirm">Confirmar Senha:</label>
+              <input
+                type="password"
+                id="registerPasswordConfirm"
+                name="passwordConfirm"
+                data-testid="register-confirm"
+              />
+              <!-- BUG 32: Confirmação de senha não é validada -->
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-testid="register-button"
+            >
+              Registrar
+            </button>
+          </form>
+          <div id="registerMessage" class="message" data-testid="message"></div>
+        </div>
+
+        <!-- Formulário de Reset de Senha -->
+        <div id="resetPasswordForm" class="form" style="display: none">
+          <h2>Resetar Senha</h2>
+          <form onsubmit="resetPassword(event)">
+            <div class="form-group">
+              <label for="resetUsername">Usuário:</label>
+              <input
+                type="text"
+                id="resetUsername"
+                name="username"
+                data-testid="reset-username"
+              />
+              <!-- BUG 33: Permite resetar qualquer senha sem verificação -->
+            </div>
+            <div class="form-group">
+              <label for="resetNewPassword">Nova Senha:</label>
+              <input
+                type="password"
+                id="resetNewPassword"
+                name="newPassword"
+                data-testid="reset-password"
+              />
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-testid="reset-button"
+            >
+              Resetar Senha
+            </button>
+          </form>
+          <p class="link-text">
+            <a href="#" onclick="showLogin()">Voltar ao login</a>
+          </p>
+          <div id="resetMessage" class="message" data-testid="message"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

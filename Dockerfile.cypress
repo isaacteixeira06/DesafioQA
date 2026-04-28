@@ -1,0 +1,11 @@
+FROM cypress/included:13.6.0
+
+WORKDIR /opt/cypress
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+ENTRYPOINT ["npx", "cypress", "run"]
