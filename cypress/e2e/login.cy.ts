@@ -62,41 +62,31 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
     // segurança
 
     it('Deve rejeitar SQL Injection retornando 401 e não 200 (Login bypass)', () => {
-        // BUG 03: Servidor não sanitiza queries
         loginPage.interceptarLogin();
-        // O payload clássico "' OR 1=1 --" tenta forçar o login burlando a senha
         loginPage.realizarLogin("' OR 1=1 --", 'qualquer');
         
-        // O teste DEVE FALHAR. Esperamos que ele recuse (401), 
-        // mas a aplicação vulnerável vai aceitar (200) e fazer o login.
         cy.wait('@loginRequest').its('response.statusCode').should('eq', 401);
     });
 
     it('Não deve refletir código HTML/JS no campo de erro (XSS Refletido)', () => {
-        // Nova vulnerabilidade identificada: XSS Refletido
+
         loginPage.interceptarLogin();
         const payloadXSS = '<script>alert("Vulnerável")</script>';
         
         loginPage.realizarLogin(payloadXSS, 'qualquer');
         loginPage.validarRespostaErro();
-        
-        // O teste DEVE FALHAR. O sistema não deve renderizar as tags de script na tela.
+
         loginPage.msgErro.should('not.contain.text', payloadXSS);
     });
 
     it('Deve impedir que o usuário copie a senha digitada', () => {
-        // BUG 26: Campo de senha permite copiar
-        loginPage.inputSenha.type('senha_secreta');
         
-        // O teste DEVE FALHAR porque o HTML do desenvolvedor não bloqueou a cópia.
-        // Esperamos que o evento oncopy retorne false, ou que o CSS impeça a seleção.
+        loginPage.inputSenha.type('senha_secreta');
         loginPage.inputSenha.should('have.css', 'user-select', 'none');
     });
 
     it('Deve exigir o preenchimento obrigatório dos campos', () => {
-        // BUG 25: Campo não tem validação required
-        
-        // O teste DEVE FALHAR porque os campos de usuário e senha não têm o atributo "required".
+
         loginPage.inputUsuario.should('have.attr', 'required');
         loginPage.inputSenha.should('have.attr', 'required');
     });
