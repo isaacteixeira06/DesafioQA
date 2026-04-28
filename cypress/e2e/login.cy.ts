@@ -36,7 +36,8 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
         loginPage.interceptarLogin();
         loginPage.realizarLogin(loginData.valido.usuario, loginData.valido.senha, true);
         loginPage.validarRespostaSucesso();
-        loginPage.verificarLoginComSucesso();
+        cy.reload(); 
+        cy.url().should('include', '/dashboard'); 
     });
 
     //Credenciais inválidas
@@ -60,14 +61,45 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
 
     // segurança
 
-    it('Deve rejeitar SQL Injection retornando 401 e não erro de servidor', () => {
-        // BUG 03 — este teste falha intencionalmente pois o servidor executa
-        // a query com concatenação de strings. Bug documentado em docs/bug_reports.md
+    it('Deve rejeitar SQL Injection retornando 401 e não 200 (Login bypass)', () => {
+        // BUG 03: Servidor não sanitiza queries
         loginPage.interceptarLogin();
-        loginPage.realizarLogin("admin' OR '1'='1", 'qualquer');
+        // O payload clássico "' OR 1=1 --" tenta forçar o login burlando a senha
+        loginPage.realizarLogin("' OR 1=1 --", 'qualquer');
+        
+        // O teste DEVE FALHAR. Esperamos que ele recuse (401), 
+        // mas a aplicação vulnerável vai aceitar (200) e fazer o login.
         cy.wait('@loginRequest').its('response.statusCode').should('eq', 401);
-        loginPage.verificarErroVisivel();
-        });
+    });
+
+    it('Não deve refletir código HTML/JS no campo de erro (XSS Refletido)', () => {
+        // Nova vulnerabilidade identificada: XSS Refletido
+        loginPage.interceptarLogin();
+        const payloadXSS = '<script>alert("Vulnerável")</script>';
+        
+        loginPage.realizarLogin(payloadXSS, 'qualquer');
+        loginPage.validarRespostaErro();
+        
+        // O teste DEVE FALHAR. O sistema não deve renderizar as tags de script na tela.
+        loginPage.msgErro.should('not.contain.text', payloadXSS);
+    });
+
+    it('Deve impedir que o usuário copie a senha digitada', () => {
+        // BUG 26: Campo de senha permite copiar
+        loginPage.inputSenha.type('senha_secreta');
+        
+        // O teste DEVE FALHAR porque o HTML do desenvolvedor não bloqueou a cópia.
+        // Esperamos que o evento oncopy retorne false, ou que o CSS impeça a seleção.
+        loginPage.inputSenha.should('have.css', 'user-select', 'none');
+    });
+
+    it('Deve exigir o preenchimento obrigatório dos campos', () => {
+        // BUG 25: Campo não tem validação required
+        
+        // O teste DEVE FALHAR porque os campos de usuário e senha não têm o atributo "required".
+        loginPage.inputUsuario.should('have.attr', 'required');
+        loginPage.inputSenha.should('have.attr', 'required');
+    });
 
     it('Deve exibir mensagem genérica de erro sem revelar se usuário existe', () => {
         loginPage.interceptarLogin();
@@ -91,7 +123,6 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
     });
 
     it('Deve omitir a senha no body da resposta da API', () => {
-        // BUG 01 — este teste falha intencionalmente, bug documentado em docs/bug_reports.md
         loginPage.interceptarLogin();
         loginPage.realizarLogin(loginData.valido.usuario, loginData.valido.senha);
         cy.wait('@loginRequest').then((interception) => {
@@ -106,7 +137,6 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
     });
 
     it('Deve evitar que a senha seja salva no localStorage após login', () => {
-        // BUG 01 — este teste falha intencionalmente, bug documentado em docs/bug_reports.md
         loginPage.interceptarLogin();
         loginPage.realizarLogin(loginData.valido.usuario, loginData.valido.senha);
         loginPage.validarRespostaSucesso();
@@ -119,8 +149,6 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
     // rate limiting
 
     it('Deve bloquear o usuário após 5 tentativas de login inválidas', () => {
-        // BUG 08 — este teste falha intencionalmente pois o sistema só bloqueia
-        // após 1000 tentativas. Bug documentado em docs/bug_reports.md
         for (let i = 0; i < 5; i++) {
         cy.clearCookies();
         cy.clearLocalStorage();
@@ -142,12 +170,13 @@ describe('Testes de Sistema (E2E) - Tela de Login', () => {
     });
 
     it('Deve evitar múltiplos submits rápidos no botão de entrar', () => {
+        loginPage.interceptarLogin();
         loginPage.inputUsuario.type(loginData.valido.usuario);
         loginPage.inputSenha.type(loginData.valido.senha);
         loginPage.btnEntrar.click();
         loginPage.btnEntrar.click({ force: true });
         loginPage.btnEntrar.click({ force: true });
-        loginPage.verificarLoginComSucesso();
+        cy.get('@loginRequest.all').should('have.length', 1);
     });
 
 });
